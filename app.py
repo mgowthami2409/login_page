@@ -39,6 +39,12 @@ def login():
             return render_template('portfolio.html')  # Or redirect to dashboard
 
     return render_template('login.html')
+def registration():
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -51,6 +57,7 @@ def register():
         if password != confirm_password:
             flash('Passwords do not match', 'error')
             return render_template('register.html')
+        return render_template('port ')
     
         password_pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$'
         if not re.match(password_pattern, password):
