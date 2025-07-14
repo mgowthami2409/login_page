@@ -1,0 +1,106 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", sans-serif;
+    background-color: rgb(39, 144, 193);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.form-container {
+    background-color: #fff;
+    padding: 40px 35px;
+    border-radius: 12px;
+    width: 320px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.form-container h2 {
+    margin-bottom: 25px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #111;
+}
+
+/* Input fields */
+.form-container input[type="text"],
+.form-container input[type="email"],
+.form-container input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: 0.2s ease;
+}
+
+.form-container input:focus {
+    border-color: #3f78e0;
+}
+
+.form-container button {
+    width: 100%;
+    padding: 12px;
+    background-color: #3f78e0;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+.form-container button:hover {
+    background-color: #2d64c7;
+}
+
+/* Small text section */
+.form-container p {
+    margin-top: 15px;
+    font-size: 13px;
+    text-align: center;
+}
+
+.form-container p a {
+    color: #3f78e0;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+/* options like "remember me" */
+.options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    margin: 8px 0 0;
+}
+
+.options a {
+    text-decoration: none;
+    color: #3f78e0;
+}
+
+.flash-messages p {
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.flash-messages p.error {
+    background-color: #f8d7da;
+    color: #842029;
+    border: 1px solid #f5c2c7;
+}
+
+.flash-messages p.success {
+    background-color: #d1e7dd;
+    color: #0f5132;
+    border: 1px solid #badbcc;
+}
