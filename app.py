@@ -76,5 +76,14 @@ def register():
 
     return render_template('register.html')
 
+@app.route('/users')
+def view_users():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    users = cursor.execute('SELECT * FROM UserDetails').fetchall()
+    conn.close()
+
+    return render_template('users.html', users=users)
+
 if __name__ == '__main__':
     app.run(debug=True)
