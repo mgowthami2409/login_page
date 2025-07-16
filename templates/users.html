@@ -1,12 +1,49 @@
 <!DOCTYPE html>
-<html>
-<head><title>User List</title></head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Registered Users</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            margin: 20px auto;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+
+        th {
+            background-color: #3f78e0;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        h2 {
+            text-align: center;
+        }
+    </style>
+</head>
 <body>
-  <h2>Registered Users</h2>
-  <ul>
-    {% for user in users %}
-      <li>{{ user['Id'] }} - {{ user['Name'] }} - {{ user['Email'] }}</li>
-    {% endfor %}
-  </ul>
+    <h2>Registered Users</h2>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.Id }}</td>
+            <td>{{ user.Name }}</td>
+            <td>{{ user.Email }}</td>
+        </tr>
+        {% endfor %}
+    </table>
 </body>
 </html>
