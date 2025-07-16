@@ -1,16 +1,17 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
-import pyodbc
-import re
 import sqlite3
-
-# SQL Server connection
-def get_db_connection():
-    conn = sqlite3.connect('users.db')
-    conn.row_factory = sqlite3.Row
-    return conn
+import re
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
+
+DATABASE = 'users.db'
+
+# Get connection
+def get_db_connection():
+    conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row
+    return conn
 
 @app.route('/')
 def home():
@@ -22,24 +23,21 @@ def login():
         email = request.form['email']
         password = request.form['password']
 
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('SELECT * FROM UserDetails WHERE Email = ?', (email,))
-        user = cursor.fetchone()
-        conn.close()
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM UserDetails WHERE Email = ?', (email,))
+            user = cursor.fetchone()
 
         if not user:
             flash('Invalid email ID', 'error')
-        elif user[3] != password:
+        elif user['Password'] != password:
             flash('Incorrect password', 'error')
         else:
-            session['user_id'] = user['Id']  # Use dictionary-style access
-
-            return render_template('portfolio.html')  # or dashboard
+            session['user_id'] = user['Id']
+            return render_template('portfolio.html')
 
     return render_template('login.html')
 
-@app.route('/register', methods=['GET', 'POST'])
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -58,30 +56,23 @@ def register():
             return render_template('register.html')
 
         try:
-            conn = get_db_connection()
-            cursor = conn.cursor()
+            with get_db_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT * FROM UserDetails WHERE Email = ?", (email,))
+                existing_user = cursor.fetchone()
 
-            # Check if email already exists
-            cursor.execute("SELECT * FROM UserDetails WHERE Email = ?", (email,))
-            existing_user = cursor.fetchone()
+                if existing_user:
+                    flash('Email already exists', 'error')
+                    return render_template('register.html')
 
-            if existing_user:
-                flash('Email already exists', 'error')
-                return render_template('register.html')
-
-            # Insert if not exists
-            cursor.execute("INSERT INTO UserDetails (Name, Email, Password) VALUES (?, ?, ?)", 
-                           (name, email, password))
-            conn.commit()
-            flash('Registration successful. Please login.', 'success')
-            return redirect(url_for('login'))
+                cursor.execute("INSERT INTO UserDetails (Name, Email, Password) VALUES (?, ?, ?)",
+                               (name, email, password))
+                conn.commit()
+                flash('Registration successful. Please login.', 'success')
+                return redirect(url_for('login'))
 
         except Exception as e:
             flash(f'Registration failed: {e}', 'error')
-            return render_template('register.html')
-
-        finally:
-            conn.close()
 
     return render_template('register.html')
 

@@ -9,17 +9,7 @@
     <div class="form-container">
         <h2>Registration</h2>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <div class="flash-messages">
-              {% for category, message in messages %}
-                <p class="{{ category }}">{{ message }}</p>
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
-
-        
+        {% include 'flash.html' %}       
 
         <form action="/register" method="post">
             <input type="text" name="name" placeholder="Enter your name" required />
