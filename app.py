@@ -1,18 +1,16 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 import pyodbc
 import re
-
-app = Flask(__name__)
-app.secret_key = 'your_secret_key'
+import sqlite3
 
 # SQL Server connection
 def get_db_connection():
-    return pyodbc.connect(
-    'DRIVER={ODBC Driver 17 for SQL Server};'
-    'SERVER=SAP-TRAINING1\SQLEXPRESS;'
-    'DATABASE=MyAppDB;'
-    'Trusted_Connection=yes;'
-    )
+    conn = sqlite3.connect('users.db')
+    conn.row_factory = sqlite3.Row
+    return conn
+
+app = Flask(__name__)
+app.secret_key = 'your_secret_key'
 
 @app.route('/')
 def home():
@@ -35,17 +33,13 @@ def login():
         elif user[3] != password:
             flash('Incorrect password', 'error')
         else:
-            session['user_id'] = user.Id
-            return render_template('portfolio.html')  # Or redirect to dashboard
+            session['user_id'] = user['Id']  # Use dictionary-style access
+
+            return render_template('portfolio.html')  # or dashboard
 
     return render_template('login.html')
-def registration():
-    if request.method == 'POST':
-        name = request.form['name']
-        email = request.form['email']
-        password = request.form['password']
-        confirm_password = request.form['confirm_password']
 
+@app.route('/register', methods=['GET', 'POST'])
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -57,8 +51,7 @@ def register():
         if password != confirm_password:
             flash('Passwords do not match', 'error')
             return render_template('register.html')
-        return render_template('port ')
-    
+
         password_pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$'
         if not re.match(password_pattern, password):
             flash('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.', 'error')
@@ -67,17 +60,28 @@ def register():
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
+
+            # Check if email already exists
+            cursor.execute("SELECT * FROM UserDetails WHERE Email = ?", (email,))
+            existing_user = cursor.fetchone()
+
+            if existing_user:
+                flash('Email already exists', 'error')
+                return render_template('register.html')
+
+            # Insert if not exists
             cursor.execute("INSERT INTO UserDetails (Name, Email, Password) VALUES (?, ?, ?)", 
                            (name, email, password))
-
             conn.commit()
-            conn.close()
             flash('Registration successful. Please login.', 'success')
             return redirect(url_for('login'))
-        except pyodbc.IntegrityError:
-            flash('Email already exists', 'error')
+
         except Exception as e:
             flash(f'Registration failed: {e}', 'error')
+            return render_template('register.html')
+
+        finally:
+            conn.close()
 
     return render_template('register.html')
 
